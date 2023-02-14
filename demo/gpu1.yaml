@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+
+metadata:
+  name: gpu1
+  namespace: default
+
+spec:
+  template:
+    spec:
+      containers:
+      - name: gpu1
+        securityContext:
+          privileged: true
+          capabilities:
+            add: ["SYS_PTRACE"]
+        command: ["/bin/bash", "-c", "cd /data/tensorflow/alexnet; python alexnet_benchmark.py"]
+        env:
+        - name: PATH
+          value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        image: registry.cn-beijing.aliyuncs.com/yoyoworks/tf-example:v1.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: "8"
+            memory: 16Gi
+            yoyoworks.com/xpu-shares: 4
+          requests:
+            cpu: "8"
+            memory: 16Gi 
+            yoyoworks.com/xpu-shares: 4
+      restartPolicy: Never
+
